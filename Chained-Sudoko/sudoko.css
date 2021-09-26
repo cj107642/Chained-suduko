@@ -1,0 +1,17 @@
+canvas { 
+    /* border: 1px solid black;  */
+    display: block;
+    margin: auto;
+    position: absolute;
+    height: 800px;
+    width: 800px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+body {
+    margin : 0;
+    padding: 0;
+}
