@@ -30,6 +30,7 @@ function draw() {
 
       generateBoard();
 
+      console.log("sudokoPath",sudokoPath)
       for(var i = 0; i < sudokoPath.length; i++){
         sudokoPath[i].draw();
       }
@@ -38,8 +39,12 @@ function draw() {
 
 
   function drawLines(){
+
+
+
     for(var i = 0; i < sudokoPath.length-1; i++){
-        var a = sudokoPath[i];
+      findNeighbours(i,sudokoPath);
+      var a = sudokoPath[i];
         var b = sudokoPath[i +1];
         if(a.line === b.line){
           ctx.beginPath();
@@ -50,6 +55,75 @@ function draw() {
           b.draw();
         }
     }
+  }
+
+  function findNeighbours (index,sudukoPaths){
+      var row = Math.floor(index / size);
+      var col =  index % size;
+      var neighBours = [];
+      var localSize = size -1;
+      var path;
+      if (row  > 0){
+        path = sudukoPaths[index-size]
+        if(!path){
+          debugger;
+        }
+        neighBours.push(path)
+      }
+
+      if(row < localSize){
+        path = sudukoPaths[index+size]
+        if(!path){
+          debugger;
+        }
+        neighBours.push(path)
+      }
+
+      if(col > 0){
+        path = sudukoPaths[index-1]
+        if(!path){
+          debugger;
+        }
+        neighBours.push(path)
+        if (row  > 0){
+          path = sudukoPaths[index-1-size]
+          if(!path){
+            debugger;
+          }
+          neighBours.push(path)
+        }
+        if(row < localSize){
+          path = sudukoPaths[index+1+size]
+          if(!path){
+            debugger;
+          }
+          neighBours.push(path)
+        }
+      }
+
+      if(col < localSize){
+        path = sudukoPaths[index+1]
+        if(!path){
+          debugger;
+        }
+        neighBours.push(path)
+        if(row < localSize){
+          path = sudukoPaths[index+1+size]
+          if(!path){
+            debugger;
+          }
+          neighBours.push(path)
+        }
+        if (row  > 0){
+          path = sudukoPaths[index-1-size]
+          if(!path){
+            debugger;
+          }
+          neighBours.push(path)
+        }
+      }
+
+      console.log("neighBours",neighBours)
   }
 
   function existsInRow(row, number){
@@ -107,7 +181,7 @@ function draw() {
         var x = Math.floor(width/2) + Math.floor(i%7)*width;
         var y = Math.floor(height/2) + Math.floor(i/7)*height;
         var line = Math.floor(i/7);
-        var color = "black";
+        var color = "red";
       sudokoPath.push(new SudukoCircle (x, y, radius, color, number, line, size))
   }
 }

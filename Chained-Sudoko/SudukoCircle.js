@@ -34,14 +34,14 @@ function SudukoCircle (x, y, radius, color, number, line, size) {
            maxY : this.y + this.radius,
        }
  
-       bounds.minXBound = x >= bounds.minX;
-       bounds.maxXBound = x <= bounds.maxX,
+       bounds.isInLeftBound = x >= bounds.minX;
+       bounds.isInRightBound = x <= bounds.maxX,
            
-       bounds.minYBound =  y >= bounds.minY,
-       bounds.maxYBound =  y <= bounds.maxY
+       bounds.isInBottomBound =  y >= bounds.minY,
+       bounds.isInTopBound =  y <= bounds.maxY
        
-       // console.log("bounds", bounds);
-       return bounds.minXBound && bounds.minYBound && bounds.maxXBound && bounds.maxYBound;
+       // console.log("boisunds", bounds);
+       return bounds.isInLeftBound && bounds.isInRightBound && bounds.isInBottomBound && bounds.isInTopBound;
     }
  
     this.update = function(){
