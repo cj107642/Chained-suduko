@@ -9,7 +9,12 @@ function SudukoCircle (x, y, radius, color, number, line, size) {
     this.size = size;
     this.potentialnumbers = []
     this.selected = false;
- 
+    this.neighBours = null;
+    
+    this.setNeighbours = function(neighBours){
+        this.neighBours = neighBours
+    }
+
     this.draw = function(){
            ctx.save();
            ctx.translate(this.x, this.y);
