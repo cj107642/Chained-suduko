@@ -1,7 +1,7 @@
 window.addEventListener("click", function(event){
-    for(var i = 0; i < sudokoPath.length; i++){
-      if(sudokoPath[i].isCordinateOnCircle(event.x, event.y)){
-        sudokoPath[i].selected = !sudokoPath[i].selected;
+    for(var i = 0; i < sudukoBoard.length; i++){
+      if(sudukoBoard[i].isCordinateOnCircle(event.x, event.y)){
+        sudukoBoard[i].selected = !sudukoBoard[i].selected;
       }
     }
   });

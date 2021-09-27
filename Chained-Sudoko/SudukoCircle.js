@@ -9,11 +9,7 @@ function SudukoCircle (x, y, radius, color, number, line, size) {
     this.size = size;
     this.potentialnumbers = []
     this.selected = false;
-    this.neighBours = null;
-    
-    this.setNeighbours = function(neighBours){
-        this.neighBours = neighBours
-    }
+    this.neighbours = [];
 
     this.draw = function(){
            ctx.save();
@@ -28,8 +24,7 @@ function SudukoCircle (x, y, radius, color, number, line, size) {
            ctx.restore();
     }
  
- 
-    this.isCordinateOnCircle = function(x,y){
+     this.isCordinateOnCircle = function(x,y){
      x = x - marginLeft;
      y = y + scrollTop;
        var bounds = {

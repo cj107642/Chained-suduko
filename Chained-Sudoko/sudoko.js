@@ -11,38 +11,66 @@ var marginLeft = Math.floor(
 var scrollTop = canvas.scrollTop;
 var ctx = canvas.getContext("2d");
 
-var sudokoPath = [];
 var radius = Math.floor(height / 4);
-
-var colors = [
-  "#004CA3",
-  "#8A51A5",
-  "#CB5E99",
-  "#F47B89",
-  "#FFA47E",
-  "#FFD286",
-  "#FFFFA6",
-];
 
 var circle = new Path2D();
 circle.arc(0, 0, radius, 0, 2 * Math.PI);
 
-function draw() {
-  generateBoard();
+var board = new Board(7);
+board.populateNeighbours();
 
-  console.log("sudokoPath", sudokoPath);
-  for (var i = 0; i < sudokoPath.length; i++) {
-    sudokoPath[i].draw();
-  }
+function draw() {
+  board.draw();
+  
+  console.log("board", board);
   drawLines();
 }
 
 function drawLines() {
-  for (var i = 0; i < sudokoPath.length - 1; i++) {
-    findNeighbours(i, sudokoPath);
-    var a = sudokoPath[i];
-    var b = sudokoPath[i + 1];
-    if (a.line === b.line) {
+
+  // var couldBuildPaths = sudukoBoard.some((path, i) => {
+  //   console.log("index", i);
+  //   if (i === 48) {
+  //     debugger;
+  //   }
+  //   var b = checkIfAbleToBuildPath(path, sudukoBoard);
+  //   return b === false;
+  // });
+
+  // for (var i = 0; i < sudukoBoard.length - 1; i++) {
+  //   var a = sudukoBoard[i];
+  //   var b = sudukoBoard[i + 1];
+  //   if (a.line === b.line) {
+  //     ctx.beginPath();
+  //     ctx.moveTo(a.x, a.y);
+  //     ctx.lineTo(b.x, b.y);
+  //     ctx.stroke();
+  //     a.draw();
+  //     b.draw();
+  //   }
+  // }
+
+  var pathsWithoutConnections = board.circles.filter((x) => !x.connectionId);
+  while (pathsWithoutConnections.length > 0) {
+    checkIfAbleToBuildPath(pathsWithoutConnections[0], board.circles);
+    pathsWithoutConnections = pathsWithoutConnections.filter(
+      (x) => !x.connectionId
+    );
+  }
+
+  var connections = {};
+  board.circles.forEach((x) => {
+    if (!connections[x.connectionId]) {
+      connections[x.connectionId] = [];
+    }
+
+    connections[x.connectionId].push(x);
+  });
+
+  Object.keys(connections).forEach((key) => {
+    for (var i = 0; i < connections[key].length - 1; i++) {
+      var a = connections[key][i];
+      var b = connections[key][i + 1];
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
@@ -50,99 +78,116 @@ function drawLines() {
       a.draw();
       b.draw();
     }
-  }
-}
-
-function findNeighbours(index, sudukoPaths) {
-  var row = Math.floor(index / size);
-  var col = index % size;
-  var neighBours = [];
-
-  // Above
-  neighBours.push(sudukoPaths[index - size]);
-  // Below
-  neighBours.push(sudukoPaths[index + size]);
-  // Right
-  neighBours.push(sudukoPaths[index + 1]);
-  // Left
-  neighBours.push(sudukoPaths[index - 1]);
-  // Above Right
-  neighBours.push(sudukoPaths[index + 1 + size]);
-  // Above Left
-  neighBours.push(sudukoPaths[index - 1 - size]);
-  // Below Right
-  neighBours.push(sudukoPaths[index + 1 + size]);
-  // Below Left
-  neighBours.push(sudukoPaths[index - 1 - size]);
-
-  neighBours = neighBours.filter(function (x) {
-    return x !== undefined;
   });
 
-  sudukoPaths[index].setNeighbours(neighBours)
-  console.log("neighBours", neighBours);
+
+  console.log("sudukoBoard", board); console.log("connections", connections);
 }
 
-function existsInRow(row, number) {
-  var rowLength = sudokoPath.length - row * 7 + 1;
-  for (var i = 0; i < rowLength; i++) {
-    var index = row * 7 + i;
-    if ((sudokoPath[index] || {}).number == number) {
-      return true;
-    }
+
+
+function RandomHexValue() {
+  return Math.floor(Math.random(0) * 16)
+    .toString(16)
+    .toUpperCase();
+}
+
+function generateRandomHexColor() {
+  return (
+    "#" +
+    RandomHexValue() +
+    RandomHexValue() +
+    RandomHexValue() +
+    RandomHexValue() +
+    RandomHexValue() +
+    RandomHexValue()
+  );
+}
+
+var uniqueColorsPerConnection = {};
+
+function checkIfAbleToBuildPath(circle, board) {
+  console.log("circle", circle);
+  console.log("board", board);
+  var startLength = 0;
+  if (circle.connectionId) {
+    startLength = board.filter(function (x) {
+      return (x.connectionId = circle.connectionId);
+    }).length;
   }
 
-  return false;
-}
+  var connectionsToMake = size - 1 - startLength;
+  var path = circle;
+  var possibleToMakePath = true;
+  for (var i = 0; i < connectionsToMake; i++) {
+    var clonedNeighbours = path.neighbours.slice();
+    path.color = "yellow";
+    path.draw();
+    clonedNeighbours.forEach((x) => {
+      x.draw();
+    });
 
-function existsInColumn(column, number) {
-  var columnLength = Math.floor(sudokoPath.length / 7) + 1;
-  for (var i = 0; i < columnLength; i++) {
-    var index = i * 7 + column;
-    if ((sudokoPath[index] || {}).number == number) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-var number = 0;
-var lastLine = null;
-function generateBoard() {
-  var startArray = [1, 2, 3, 4, 5, 6, 7];
-
-  for (var i = 0; i < size * size; i++) {
-    var currentLine = Math.floor(i / 7);
-    if (currentLine != lastLine) {
-      lastLine = Math.floor(i / 7);
-    }
-
-    if (currentLine == 0) {
-      number = startArray.splice(
-        Math.floor(Math.random() * startArray.length),
+    var found = false;
+    var searching = true;
+    while (searching && clonedNeighbours.length) {
+      neighbour = clonedNeighbours.splice(
+        Math.floor(Math.random() * clonedNeighbours.length),
         1
       )[0];
-    } else {
-      var found = false;
-      var row = Math.floor(i / 7);
-      var col = i % 7;
-      var numberArray = [1, 2, 3, 4, 5, 6, 7];
-      while (!found && numberArray.length) {
-        number = numberArray.splice(
-          Math.floor(Math.random() * numberArray.length),
-          1
-        )[0];
-        if (!existsInRow(row, number) && !existsInColumn(col, number)) {
+
+      if (path.connectionId && neighbour.connectionId) {
+        continue;
+      }
+
+      if (neighbour.connectionId && !path.connectionId) {
+        var connections = board.filter(
+          (x) => x.connectionId === neighbour.connectionId
+        );
+
+        if (connections.length < 7) {
+          path.connectionId = neighbour.connectionId;
+          path.color = uniqueColorsPerConnection[path.connectionId];
+          neighbour.color = uniqueColorsPerConnection[path.connectionId];
+          i += connections.length;
+          path.draw();
+          neighbour.draw();
+          path = neighbour;
+          searching = false;
           found = true;
+          break;
         }
       }
+
+      if (!path.connectionId) {
+        path.connectionId = Math.floor(Math.random() * 1000);
+      }
+
+      neighbour.connectionId = path.connectionId;
+      if (!uniqueColorsPerConnection[path.connectionId]) {
+        uniqueColorsPerConnection[path.connectionId] = generateRandomHexColor();
+      }
+
+      board.forEach((x) => {
+        if (x.connectionId) {
+          x.color = uniqueColorsPerConnection[x.connectionId];
+        } else {
+          x.color = "black";
+          x.draw();
+        }
+      });
+      path.color = uniqueColorsPerConnection[path.connectionId];
+      neighbour.color = uniqueColorsPerConnection[path.connectionId];
+      path.draw();
+      neighbour.draw();
+      path = neighbour;
+      searching = false;
+      found = true;
     }
 
-    var x = Math.floor(width / 2) + Math.floor(i % 7) * width;
-    var y = Math.floor(height / 2) + Math.floor(i / 7) * height;
-    var line = Math.floor(i / 7);
-    var color = "red";
-    sudokoPath.push(new SudukoCircle(x, y, radius, color, number, line, size));
+    if (!found) {
+      possibleToMakePath = false;
+      break;
+    }
   }
+  return possibleToMakePath;
 }
