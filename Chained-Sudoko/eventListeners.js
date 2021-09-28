@@ -1,5 +1,5 @@
 window.addEventListener("click", function(event){
-    for(var i = 0; i < sudukoBoard.length; i++){
+    for(var i = 0; i < board.circles.length; i++){
       if(sudukoBoard[i].isCordinateOnCircle(event.x, event.y)){
         sudukoBoard[i].selected = !sudukoBoard[i].selected;
       }

@@ -10,14 +10,20 @@ function SudukoCircle (x, y, radius, color, number, line, size) {
     this.potentialnumbers = []
     this.selected = false;
     this.neighbours = [];
+    this.newGuid = function() {
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+      }
 
-    this.draw = function(){
+    this.id = this.newGuid();
+    this.draw = function(color){
            ctx.save();
            ctx.translate(this.x, this.y);
-           ctx.strokeStyle = this.color;
+           ctx.strokeStyle = color ?? this.color;
            ctx.fillStyle = 'white';
-           ctx.fill(circle);
-           ctx.stroke(circle);
+           ctx.fill(node);
+           ctx.stroke(node);
            ctx.font = "20px georgia";
            ctx.fillStyle = 'black';
            ctx.fillText(number,-4,4)
