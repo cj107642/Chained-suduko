@@ -1,69 +1,55 @@
-function SudukoCircle (x, y, radius, color, number, line, size) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-    this.number = number;
-    this.startNumber = number;
-    this.line = line
-    this.size = size;
-    this.potentialnumbers = []
-    this.selected = false;
-    this.neighbours = [];
-    this.newGuid = function() {
-        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-        );
-      }
-
-    this.id = this.newGuid();
-    this.draw = function(color){
-           ctx.save();
-           ctx.translate(this.x, this.y);
-           ctx.strokeStyle = color ?? this.color;
-           ctx.fillStyle = 'white';
-           ctx.fill(node);
-           ctx.stroke(node);
-           ctx.font = "20px georgia";
-           ctx.fillStyle = 'black';
-           ctx.fillText(number,-4,4)
-           ctx.restore();
+import { v4 as uuid } from 'uuid';
+export class SudukoCircle {
+    constructor(x, y, radius, color, value, size, circle, ctx) {
+        this.neighbours = [];
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.value = value;
+        this.size = size;
+        this.id = uuid();
+        this.circle = circle;
+        this.ctx = ctx;
     }
- 
-     this.isCordinateOnCircle = function(x,y){
-     x = x - marginLeft;
-     y = y + scrollTop;
-       var bounds = {
-           minX : this.x - this.radius,
-           minY : this.y - this.radius,
-           maxX : this.x + this.radius,
-           maxY : this.y + this.radius,
-       }
- 
-       bounds.isInLeftBound = x >= bounds.minX;
-       bounds.isInRightBound = x <= bounds.maxX,
-           
-       bounds.isInBottomBound =  y >= bounds.minY,
-       bounds.isInTopBound =  y <= bounds.maxY
-       
-       // console.log("boisunds", bounds);
-       return bounds.isInLeftBound && bounds.isInRightBound && bounds.isInBottomBound && bounds.isInTopBound;
+    draw(color = "") {
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        this.ctx.strokeStyle = color == "" ? this.color : color;
+        this.ctx.fillStyle = 'white';
+        this.ctx.fill(this.circle);
+        this.ctx.stroke(this.circle);
+        this.ctx.font = "20px georgia";
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillText(this.value.toString(), -4, 4);
+        this.ctx.restore();
     }
- 
-    this.update = function(){
+    isCordinateOnCircle(x, y) {
+        // x = x - marginLeft;
+        // y = y + scrollTop;
+        var bounds = {
+            minX: this.x - this.radius,
+            minY: this.y - this.radius,
+            maxX: this.x + this.radius,
+            maxY: this.y + this.radius,
+        };
+        var isInLeftBound = x >= bounds.minX;
+        var isInRightBound = x <= bounds.maxX;
+        var isInBottomBound = y >= bounds.minY;
+        var isInTopBound = y <= bounds.maxY;
+        return isInLeftBound && isInRightBound && isInBottomBound && isInTopBound;
     }
-
-    this.openSelectNumbers = function(sc){
-        var x = this.x;
-        var y = this.y + this.radius
-        for(var i = 0; i < this.size; i++){
+    openSelectNumbers() {
+        let x = this.x;
+        let y = this.y + this.radius;
+        for (let i = 0; i < this.size; i++) {
             console.log("x", x);
             console.log("y", y);
-            ctx.save();
-            ctx.translate(x,y);
-            ctx.fillRect(0,0,20,20);
-            ctx.fill();
-            ctx.restore();
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            this.ctx.fillRect(0, 0, 20, 20);
+            this.ctx.fill();
+            this.ctx.restore();
         }
     }
- }
+}
